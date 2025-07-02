@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 GAME_REQUIREMENT = 2
 
 
-async def therapeutic_candidates(  # noqa: PLR0912
+async def material_candidates(  # noqa: PLR0912
     candidate_generation_goal: str,
     configuration: RobinConfiguration,
     experimental_insights: dict[str, str] | None = None,
@@ -44,7 +44,7 @@ async def therapeutic_candidates(  # noqa: PLR0912
 
     candidate_query_generation_system_message = (
         configuration.prompts.candidate_query_generation_system_message.format(
-            disease_name=configuration.disease_name
+            research_topic=configuration.research_topic
         )
     )
 
@@ -73,7 +73,7 @@ async def therapeutic_candidates(  # noqa: PLR0912
             num_queries=configuration.num_queries,
             double_queries=2 * configuration.num_queries,
             candidate_generation_goal=candidate_generation_goal,
-            disease_name=configuration.disease_name,
+            research_topic=configuration.research_topic,
         )
     )
 
@@ -132,14 +132,14 @@ async def therapeutic_candidates(  # noqa: PLR0912
 
     candidate_generation_system_message = (
         configuration.prompts.candidate_generation_system_message.format(
-            disease_name=configuration.disease_name,
+            research_topic=configuration.research_topic,
             num_candidates=configuration.num_candidates,
         )
     )
 
     candidate_generation_user_message = (
         configuration.prompts.candidate_generation_user_message.format(
-            disease_name=configuration.disease_name,
+            research_topic=configuration.research_topic,
             num_candidates=configuration.num_candidates,
             therapeutic_candidate_review_output=therapeutic_candidate_review_output,
         )
@@ -276,12 +276,12 @@ async def therapeutic_candidates(  # noqa: PLR0912
 
         candidate_lit_review_direction_prompt = (
             configuration.prompts.candidate_lit_review_direction_prompt.format(
-                disease_name=configuration.disease_name
+                research_topic=configuration.research_topic
             )
         )
 
         candidate_report_format = configuration.prompts.candidate_report_format.format(
-            disease_name=configuration.disease_name
+            research_topic=configuration.research_topic
         )
 
         candidate_queries = {}
@@ -337,7 +337,7 @@ async def therapeutic_candidates(  # noqa: PLR0912
 
     candidate_ranking_system_prompt = (
         configuration.prompts.candidate_ranking_system_prompt.format(
-            disease_name=configuration.disease_name
+            research_topic=configuration.research_topic
         )
     )
 
