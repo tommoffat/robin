@@ -230,7 +230,7 @@ async def experimental_assay(configuration: RobinConfiguration) -> str | None:
 
     logger.info(f"Experimental Assay Selected: {top_experimental_assay}")
 
-    # ## Synthesizing goal for candidate generation using specified assay and disease
+    # ## Synthesizing goal for candidate generation using specified experiment and topic
 
     async def synthesize_candidate_goal(
         assay_name: str, client: LiteLLMModel

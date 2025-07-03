@@ -34,7 +34,7 @@ async def material_candidates(  # noqa: PLR0912
 ) -> None:
 
     logger.info(
-        f"Starting generation of {configuration.num_candidates} therapeutic candidates."
+        f"Starting generation of {configuration.num_candidates} material candidates."
     )
     logger.info("———————————————————————————————————————————————————————————————")
 
@@ -96,11 +96,11 @@ async def material_candidates(  # noqa: PLR0912
 
     candidate_generation_queries_dict = {q: q for q in candidate_generation_queries}
 
-    # ### Step 2: Literature review on therapeutic candidates
+    # ### Step 2: Literature review on material candidates
 
     logger.info("\nStep 2: Conducting literature search with FutureHouse platform...")
 
-    therapeutic_candidate_review = await call_platform(
+    material_candidate_review = await call_platform(
         queries=candidate_generation_queries_dict,
         fh_client=configuration.fh_client,
         job_name=configuration.agent_settings.candidate_lit_search_agent,
@@ -108,25 +108,25 @@ async def material_candidates(  # noqa: PLR0912
 
     if experimental_insights:
         save_crow_files(
-            therapeutic_candidate_review["results"],
-            run_dir=f"robin_output/{run_config_folder_name}/therapeutic_candidate_literature_reviews_experimental",
+            material_candidate_review["results"],
+            run_dir=f"robin_output/{run_config_folder_name}/material_candidate_literature_reviews_experimental",
             prefix="query",
         )
     else:
         save_crow_files(
-            therapeutic_candidate_review["results"],
-            run_dir=f"robin_output/{run_config_folder_name}/therapeutic_candidate_literature_reviews",
+            material_candidate_review["results"],
+            run_dir=f"robin_output/{run_config_folder_name}/material_candidate_literature_reviews",
             prefix="query",
         )
 
-    therapeutic_candidate_review_output = output_to_string(
-        therapeutic_candidate_review["results"]
+    material_candidate_review_output = output_to_string(
+        material_candidate_review["results"]
     )
 
-    # ### Step 3: Proposing therapeutic candidates
+    # ### Step 3: Proposing material candidates
 
     logger.info(
-        f"\nStep 3: Generating {configuration.num_candidates} ideas for therapeutic"
+        f"\nStep 3: Generating {configuration.num_candidates} ideas for material"
         " candidates..."
     )
 
@@ -141,7 +141,7 @@ async def material_candidates(  # noqa: PLR0912
         configuration.prompts.candidate_generation_user_message.format(
             research_topic=configuration.research_topic,
             num_candidates=configuration.num_candidates,
-            therapeutic_candidate_review_output=therapeutic_candidate_review_output,
+            material_candidate_review_output=material_candidate_review_output,
         )
     )
 
@@ -246,10 +246,10 @@ async def material_candidates(  # noqa: PLR0912
         logger.info(f"{idea_str[:100]}...")
 
     if experimental_insights:
-        candidate_list_export_file = f"robin_output/{run_config_folder_name}/therapeutic_candidates_summary_experimental.txt"
+        candidate_list_export_file = f"robin_output/{run_config_folder_name}/material_candidates_summary_experimental.txt"
     else:
         candidate_list_export_file = (
-            f"robin_output/{run_config_folder_name}/therapeutic_candidates_summary.txt"
+            f"robin_output/{run_config_folder_name}/material_candidates_summary.txt"
         )
 
     async with aiofiles.open(candidate_list_export_file, "w") as f:
@@ -270,7 +270,7 @@ async def material_candidates(  # noqa: PLR0912
 
     logger.info("\nStep 4: Detailed investigation and evaluation for candidates...")
 
-    def create_therapeutic_candidate_queries(
+    def create_material_candidate_queries(
         candidate_idea_list: list[str],
     ) -> dict[str, str]:
 
@@ -300,39 +300,39 @@ async def material_candidates(  # noqa: PLR0912
 
         return candidate_queries
 
-    therapeutic_candidate_queries = create_therapeutic_candidate_queries(
+    material_candidate_queries = create_material_candidate_queries(
         candidate_idea_list=candidate_idea_list
     )
 
-    therapeutic_candidate_hypotheses = await call_platform(
-        queries=therapeutic_candidate_queries,
+    material_candidate_hypotheses = await call_platform(
+        queries=material_candidate_queries,
         fh_client=configuration.fh_client,
         job_name=configuration.agent_settings.candidate_hypothesis_report_agent,
     )
 
-    final_therapeutic_candidate_hypotheses = await format_final_report(
-        therapeutic_candidate_hypotheses["results"], configuration.llm_client
+    final_material_candidate_hypotheses = await format_final_report(
+        material_candidate_hypotheses["results"], configuration.llm_client
     )
 
     if experimental_insights:
         save_falcon_files(
-            final_therapeutic_candidate_hypotheses,
-            run_dir=f"robin_output/{run_config_folder_name}/therapeutic_candidate_detailed_hypotheses_experimental",
-            prefix="therapeutic_candidate",
+            final_material_candidate_hypotheses,
+            run_dir=f"robin_output/{run_config_folder_name}/material_candidate_detailed_hypotheses_experimental",
+            prefix="material_candidate",
         )
     else:
         save_falcon_files(
-            final_therapeutic_candidate_hypotheses,
-            run_dir=f"robin_output/{run_config_folder_name}/therapeutic_candidate_detailed_hypotheses",
-            prefix="therapeutic_candidate",
+            final_material_candidate_hypotheses,
+            run_dir=f"robin_output/{run_config_folder_name}/material_candidate_detailed_hypotheses",
+            prefix="material_candidate",
         )
 
-    # ### Step 5: Ranking/selecting the therapeutic candidates
+    # ### Step 5: Ranking/selecting the material candidates
 
-    logger.info("\nStep 5: Ranking the strength of the therapeutic candidates...")
+    logger.info("\nStep 5: Ranking the strength of the material candidates...")
 
     candidate_information_df = extract_candidate_info_from_folder(
-        f"robin_output/{run_config_folder_name}/therapeutic_candidate_detailed_hypotheses"
+        f"robin_output/{run_config_folder_name}/material_candidate_detailed_hypotheses"
     )
 
     candidate_ranking_system_prompt = (
@@ -350,7 +350,7 @@ async def material_candidates(  # noqa: PLR0912
         candidate_ranking_output_folder_path = Path(candidate_ranking_output_folder)
         candidate_ranking_output_filepath = (
             candidate_ranking_output_folder_path
-            / "therapeutic_candidate_ranking_results_experimental.csv"
+            / "material_candidate_ranking_results_experimental.csv"
         )
         candidate_ranking_output_folder_path.mkdir(parents=True, exist_ok=True)
 
@@ -362,7 +362,7 @@ async def material_candidates(  # noqa: PLR0912
         candidate_ranking_output_folder_path = Path(candidate_ranking_output_folder)
         candidate_ranking_output_filepath = (
             candidate_ranking_output_folder_path
-            / "therapeutic_candidate_ranking_results.csv"
+            / "material_candidate_ranking_results.csv"
         )
         candidate_ranking_output_folder_path.mkdir(parents=True, exist_ok=True)
 
@@ -380,13 +380,13 @@ async def material_candidates(  # noqa: PLR0912
     )
 
     logger.info(f"Processing ranking output from: {candidate_ranking_output_filepath}")
-    therapeutic_candidate_ranking_df = processing_ranking_output(
+    material_candidate_ranking_df = processing_ranking_output(
         str(candidate_ranking_output_filepath)
     )
 
     if (
-        therapeutic_candidate_ranking_df.empty
-        or "Game Score" not in therapeutic_candidate_ranking_df.columns
+        material_candidate_ranking_df.empty
+        or "Game Score" not in material_candidate_ranking_df.columns
     ):
         logger.error(
             "Ranking DataFrame is empty or missing 'Game Score' column. Cannot proceed"
@@ -394,9 +394,9 @@ async def material_candidates(  # noqa: PLR0912
         )
         return
 
-    raw_game_scores_from_df = therapeutic_candidate_ranking_df["Game Score"].to_list()
+    raw_game_scores_from_df = material_candidate_ranking_df["Game Score"].to_list()
 
-    therapeutic_candidate_games_data = []
+    material_candidate_games_data = []
     valid_game_count = 0
     invalid_game_count = 0
 
@@ -415,7 +415,7 @@ async def material_candidates(  # noqa: PLR0912
                     and 0 <= loser_id < len(candidate_information_df)
                     and winner_id != loser_id
                 ):
-                    therapeutic_candidate_games_data.append((winner_id, loser_id))
+                    material_candidate_games_data.append((winner_id, loser_id))
                     valid_game_count += 1
                 else:
                     logger.warning(
@@ -441,7 +441,7 @@ async def material_candidates(  # noqa: PLR0912
             f" {invalid_game_count} invalid/malformed game scores for Choix."
         )
 
-    if not therapeutic_candidate_games_data:
+    if not material_candidate_games_data:
         logger.error(
             "No valid game data to pass to choix.ilsr_pairwise. Aborting candidate"
             " ranking scores computation."
@@ -450,11 +450,11 @@ async def material_candidates(  # noqa: PLR0912
             columns=["hypothesis", "answer", "strength_score", "index"]
         )
         candidate_ranked_results_sorted_empty.to_csv(
-            f"{candidate_ranking_output_folder}/ranked_therapeutic_candidates_empty.csv",
+            f"{candidate_ranking_output_folder}/ranked_material_candidates_empty.csv",
             index=False,
         )
         logger.info(
-            "Saved an empty ranked_therapeutic_candidates_empty.csv due to no valid"
+            "Saved an empty ranked_material_candidates_empty.csv due to no valid"
             " game data."
         )
         return
@@ -462,26 +462,26 @@ async def material_candidates(  # noqa: PLR0912
     n_items = len(candidate_information_df)
     logger.info(
         f"Calling choix.ilsr_pairwise with n_items={n_items} and"
-        f" {len(therapeutic_candidate_games_data)} games."
+        f" {len(material_candidate_games_data)} games."
     )
 
     try:
-        therapeutic_candidate_params = choix.ilsr_pairwise(
-            n_items, therapeutic_candidate_games_data, alpha=0.1
+        material_candidate_params = choix.ilsr_pairwise(
+            n_items, material_candidate_games_data, alpha=0.1
         )
     except Exception:
         logger.exception("Error during choix.ilsr_pairwise")
         logger.exception(f"  n_items: {n_items}")
-        logger.exception(f"  Number of games: {len(therapeutic_candidate_games_data)}")
-        if therapeutic_candidate_games_data:
+        logger.exception(f"  Number of games: {len(material_candidate_games_data)}")
+        if material_candidate_games_data:
             logger.exception(
-                f"  Example game data: {therapeutic_candidate_games_data[:5]}"
+                f"  Example game data: {material_candidate_games_data[:5]}"
             )
             all_ids_in_games = set()
             for (
                 w,
                 l_,
-            ) in therapeutic_candidate_games_data:
+            ) in material_candidate_games_data:
                 all_ids_in_games.add(w)
                 all_ids_in_games.add(l_)
             if all_ids_in_games:
@@ -494,11 +494,11 @@ async def material_candidates(  # noqa: PLR0912
         ].copy()
         candidate_ranked_results_sorted_error["strength_score"] = float("nan")
         candidate_ranked_results_sorted_error.to_csv(
-            f"{candidate_ranking_output_folder}/ranked_therapeutic_candidates_choix_error.csv",
+            f"{candidate_ranking_output_folder}/ranked_material_candidates_choix_error.csv",
             index=False,
         )
         logger.info(
-            "Saved ranked_therapeutic_candidates_choix_error.csv due to error in Choix."
+            "Saved ranked_material_candidates_choix_error.csv due to error in Choix."
         )
         return
 
@@ -507,8 +507,8 @@ async def material_candidates(  # noqa: PLR0912
         candidate_ranked_results["hypothesis"] = candidate_information_df["hypothesis"]
         candidate_ranked_results["answer"] = candidate_information_df["answer"]
         candidate_ranked_results["index"] = candidate_information_df["index"]
-        if len(therapeutic_candidate_params) == len(candidate_information_df):
-            candidate_ranked_results["strength_score"] = therapeutic_candidate_params
+        if len(material_candidate_params) == len(candidate_information_df):
+            candidate_ranked_results["strength_score"] = material_candidate_params
         else:
             logger.error(
                 "Mismatch in length between Choix params and candidate_information_df."
@@ -530,19 +530,19 @@ async def material_candidates(  # noqa: PLR0912
 
     if experimental_insights:
         candidate_ranked_results_sorted.to_csv(
-            f"{candidate_ranking_output_folder}/ranked_therapeutic_candidates_experimental.csv",
+            f"{candidate_ranking_output_folder}/ranked_material_candidates_experimental.csv",
             index=False,
         )
         logger.info(
             "Finished! Saved final rankings to"
-            f" {candidate_ranking_output_folder}/ranked_therapeutic_candidates_experimental.csv"
+            f" {candidate_ranking_output_folder}/ranked_material_candidates_experimental.csv"
         )
     else:
         candidate_ranked_results_sorted.to_csv(
-            f"{candidate_ranking_output_folder}/ranked_therapeutic_candidates.csv",
+            f"{candidate_ranking_output_folder}/ranked_material_candidates.csv",
             index=False,
         )
         logger.info(
             "Finished! Saved final rankings to"
-            f" {candidate_ranking_output_folder}/ranked_therapeutic_candidates.csv"
+            f" {candidate_ranking_output_folder}/ranked_material_candidates.csv"
         )

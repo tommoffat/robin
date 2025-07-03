@@ -164,7 +164,7 @@ async def data_analysis(
             "followup_suggestions": "Error in the LLM response parsing.",
         }
 
-    drugs_in_data = data_interpretation_response[0]
+    materials_in_data = data_interpretation_response[0]
     analysis_summary = data_interpretation_response[1]
     questions_raised = data_interpretation_response[2]
     mechanistic_insights = data_interpretation_response[3]
@@ -189,9 +189,9 @@ async def data_analysis(
 
     analysis_summary = (
         analysis_summary
-        + " These drugs have already been tested: "
-        + drugs_in_data
-        + " AS THEY HAVE BEEN TESTED, DO NOT SUGGEST THESE DRUGS AGAIN."
+        + " These materials have already been tested: "
+        + materials_in_data
+        + " AS THEY HAVE BEEN TESTED, DO NOT SUGGEST THESE MATERIALS AGAIN."
     )
 
     return {

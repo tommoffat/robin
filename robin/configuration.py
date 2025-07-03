@@ -173,7 +173,7 @@ class Prompts(BaseModel):
             "candidate_generation_user_message": {
                 "num_candidates",
                 "research_topic",
-                "therapeutic_candidate_review_output",
+                "material_candidate_review_output",
             },
             "experimental_insights_for_candidate_generation": {
                 "candidate_generation_goal",
@@ -242,14 +242,14 @@ class AgentConfig(BaseModel):
     candidate_lit_search_agent: JobNames = Field(
         default=JobNames.CROW,
         description=(
-            "Agent to use for literature search during therapeutic candidate idea"
+            "Agent to use for literature search during material candidate idea"
             " generation."
         ),
     )
     candidate_hypothesis_report_agent: JobNames = Field(
         default=JobNames.FALCON,
         description=(
-            "Agent to use for generating detailed reports on therapeutic candidates."
+            "Agent to use for generating detailed reports on material candidates."
         ),
     )
 
@@ -292,9 +292,9 @@ class RobinConfiguration(BaseModel):
     @model_validator(mode="after")
     def set_run_folder_name_default(self) -> "RobinConfiguration":
         if self.run_folder_name is None:
-            disease_part = self.research_topic[:70].replace(" ", "_")
+            topic_part = self.research_topic[:70].replace(" ", "_")
             timestamp_part = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            self.run_folder_name = f"{disease_part}_{timestamp_part}"
+            self.run_folder_name = f"{topic_part}_{timestamp_part}"
         return self
 
     @property
