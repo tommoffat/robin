@@ -144,19 +144,19 @@ class Prompts(BaseModel):
                 "questions_raised",
             },
             "assay_literature_system_message": {"num_assays"},
-            "assay_literature_user_message": {"num_queries", "disease_name"},
+            "assay_literature_user_message": {"num_queries", "research_topic"},
             "assay_proposal_system_message": {"num_assays"},
             "assay_proposal_user_message": {
                 "num_assays",
-                "disease_name",
+                "research_topic",
                 "assay_lit_review_output",
             },
-            "assay_hypothesis_system_prompt": {"disease_name"},
-            "assay_hypothesis_format": {"disease_name"},
-            "assay_ranking_system_prompt": {"disease_name"},
-            "synthesize_user_content": {"assay_name", "disease_name"},
-            "synthesize_system_message_content": {"disease_name"},
-            "candidate_query_generation_system_message": {"disease_name"},
+            "assay_hypothesis_system_prompt": {"research_topic"},
+            "assay_hypothesis_format": {"research_topic"},
+            "assay_ranking_system_prompt": {"research_topic"},
+            "synthesize_user_content": {"assay_name", "research_topic"},
+            "synthesize_system_message_content": {"research_topic"},
+            "candidate_query_generation_system_message": {"research_topic"},
             "experimental_insights_appendage": {
                 "candidate_generation_goal",
                 "experimental_insights_analysis_summary",
@@ -167,13 +167,13 @@ class Prompts(BaseModel):
                 "num_queries",
                 "double_queries",
                 "candidate_generation_goal",
-                "disease_name",
+                "research_topic",
             },
-            "candidate_generation_system_message": {"disease_name", "num_candidates"},
+            "candidate_generation_system_message": {"research_topic", "num_candidates"},
             "candidate_generation_user_message": {
                 "num_candidates",
-                "disease_name",
-                "therapeutic_candidate_review_output",
+                "research_topic",
+                "material_candidate_review_output",
             },
             "experimental_insights_for_candidate_generation": {
                 "candidate_generation_goal",
@@ -181,9 +181,9 @@ class Prompts(BaseModel):
                 "experimental_insights_mechanistic_insights",
                 "experimental_insights_questions_raised",
             },
-            "candidate_lit_review_direction_prompt": {"disease_name"},
-            "candidate_report_format": {"disease_name"},
-            "candidate_ranking_system_prompt": {"disease_name"},
+            "candidate_lit_review_direction_prompt": {"research_topic"},
+            "candidate_report_format": {"research_topic"},
+            "candidate_ranking_system_prompt": {"research_topic"},
             "cot": set(),
             "guideline": set(),
             "assay_ranking_prompt_format": set(),
@@ -242,14 +242,14 @@ class AgentConfig(BaseModel):
     candidate_lit_search_agent: JobNames = Field(
         default=JobNames.CROW,
         description=(
-            "Agent to use for literature search during therapeutic candidate idea"
+            "Agent to use for literature search during material candidate idea"
             " generation."
         ),
     )
     candidate_hypothesis_report_agent: JobNames = Field(
         default=JobNames.FALCON,
         description=(
-            "Agent to use for generating detailed reports on therapeutic candidates."
+            "Agent to use for generating detailed reports on material candidates."
         ),
     )
 
@@ -271,15 +271,15 @@ class RobinConfiguration(BaseModel):
     num_candidates: int = Field(
         default=5, description="Number of candidates to generate for each query."
     )
-    disease_name: str = Field(
-        default="input_disease", description="Name of the disease to focus on."
+    research_topic: str = Field(
+        default="input_topic", description="Main materials science topic."
     )
     run_folder_name: str | None = Field(
         default=None,
         description=(
             "Name of the folder where results will be stored. "
             "If not provided or None, it will be auto-generated "
-            "using the disease_name and the timestamp."
+            "using the research_topic and the timestamp."
         ),
     )
     futurehouse_api_key: str = "insert_futurehouse_api_key_here"
@@ -292,9 +292,9 @@ class RobinConfiguration(BaseModel):
     @model_validator(mode="after")
     def set_run_folder_name_default(self) -> "RobinConfiguration":
         if self.run_folder_name is None:
-            disease_part = self.disease_name[:70].replace(" ", "_")
+            topic_part = self.research_topic[:70].replace(" ", "_")
             timestamp_part = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            self.run_folder_name = f"{disease_part}_{timestamp_part}"
+            self.run_folder_name = f"{topic_part}_{timestamp_part}"
         return self
 
     @property

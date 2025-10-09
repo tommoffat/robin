@@ -944,7 +944,7 @@ def _raise_if_file_not_found(csv_path_str: str) -> None:
 
 
 def read_and_process_csv(csv_path: str) -> str | None:
-    """Reads CSV, converts to simple HTML, and extracts drug names."""
+    """Reads CSV, converts to simple HTML, and extracts material names."""
     try:
         _raise_if_file_not_found(csv_path)
         csv_df = pd.read_csv(csv_path)

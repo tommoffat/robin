@@ -41,7 +41,7 @@ async def experimental_assay(configuration: RobinConfiguration) -> str | None:
     assay_literature_user_message = (
         configuration.prompts.assay_literature_user_message.format(
             num_queries=configuration.num_queries,
-            disease_name=configuration.disease_name,
+            research_topic=configuration.research_topic,
         )
     )
 
@@ -97,7 +97,7 @@ async def experimental_assay(configuration: RobinConfiguration) -> str | None:
     assay_proposal_user_message = (
         configuration.prompts.assay_proposal_user_message.format(
             num_assays=configuration.num_assays,
-            disease_name=configuration.disease_name,
+            research_topic=configuration.research_topic,
             assay_lit_review_output=assay_lit_review_output,
         )
     )
@@ -141,12 +141,12 @@ async def experimental_assay(configuration: RobinConfiguration) -> str | None:
 
         assay_hypothesis_system_prompt = (
             configuration.prompts.assay_hypothesis_system_prompt.format(
-                disease_name=configuration.disease_name
+                research_topic=configuration.research_topic
             )
         )
 
         assay_hypothesis_format = configuration.prompts.assay_hypothesis_format.format(
-            disease_name=configuration.disease_name
+            research_topic=configuration.research_topic
         )
 
         assay_hypothesis_queries = {}
@@ -189,7 +189,7 @@ async def experimental_assay(configuration: RobinConfiguration) -> str | None:
 
     assay_ranking_system_prompt = (
         configuration.prompts.assay_ranking_system_prompt.format(
-            disease_name=configuration.disease_name
+            research_topic=configuration.research_topic
         )
     )
 
@@ -230,19 +230,19 @@ async def experimental_assay(configuration: RobinConfiguration) -> str | None:
 
     logger.info(f"Experimental Assay Selected: {top_experimental_assay}")
 
-    # ## Synthesizing goal for candidate generation using specified assay and disease
+    # ## Synthesizing goal for candidate generation using specified experiment and topic
 
     async def synthesize_candidate_goal(
         assay_name: str, client: LiteLLMModel
     ) -> str | None:
 
         synthesize_user_content = configuration.prompts.synthesize_user_content.format(
-            assay_name=assay_name, disease_name=configuration.disease_name
+            assay_name=assay_name, research_topic=configuration.research_topic
         )
 
         synthesize_system_message_content = (
             configuration.prompts.synthesize_system_message_content.format(
-                disease_name=configuration.disease_name
+                research_topic=configuration.research_topic
             )
         )
 
